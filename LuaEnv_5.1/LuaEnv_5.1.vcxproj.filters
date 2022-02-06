@@ -18,17 +18,120 @@
     <ClCompile Include="LuaEnv_5.1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="include\lapi.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\lcode.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ldebug.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ldo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\lfunc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\lgc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\lmem.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\lobject.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\lopcodes.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\lparser.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\lstring.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\lstate.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ltm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\lundump.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\lvm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\lzio.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ltable.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\llex.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\lapi.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\lcode.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ldebug.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ldo.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\lfunc.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\lgc.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\llex.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\llimits.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\lmem.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\lobject.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\lopcodes.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\lparser.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\lstate.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\lstring.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ltable.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ltm.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\lundump.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\lvm.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\lzio.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="LuaPreDefined.lua" />
     <None Include="LuaExec.lua" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="include\lobject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\llimits.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

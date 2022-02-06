@@ -29,26 +29,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -88,7 +88,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4996;4042</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -140,6 +140,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="include\lapi.c" />
+    <ClCompile Include="include\lcode.c" />
+    <ClCompile Include="include\ldebug.c" />
+    <ClCompile Include="include\ldo.c" />
+    <ClCompile Include="include\lfunc.c" />
+    <ClCompile Include="include\lgc.c" />
+    <ClCompile Include="include\llex.c" />
+    <ClCompile Include="include\lmem.c" />
+    <ClCompile Include="include\lobject.c" />
+    <ClCompile Include="include\lopcodes.c" />
+    <ClCompile Include="include\lparser.c" />
+    <ClCompile Include="include\lstate.c" />
+    <ClCompile Include="include\lstring.c" />
+    <ClCompile Include="include\ltable.c" />
+    <ClCompile Include="include\ltm.c" />
+    <ClCompile Include="include\lundump.c" />
+    <ClCompile Include="include\lvm.c" />
+    <ClCompile Include="include\lzio.c" />
     <ClCompile Include="LuaEnv_5.1.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -147,8 +165,31 @@
     <None Include="LuaPreDefined.lua" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\llimits.h" />
-    <ClInclude Include="include\lobject.h" />
+    <ClCompile Include="include\lapi.h" />
+    <ClCompile Include="include\lcode.h" />
+    <ClCompile Include="include\ldebug.h" />
+    <ClCompile Include="include\ldo.h" />
+    <ClCompile Include="include\lfunc.h" />
+    <ClCompile Include="include\lgc.h" />
+    <ClCompile Include="include\lmem.h" />
+    <ClCompile Include="include\lobject.h" />
+    <ClCompile Include="include\lopcodes.h" />
+    <ClCompile Include="include\lparser.h" />
+    <ClCompile Include="include\lstring.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="include\lstate.h" />
+    <ClCompile Include="include\ltm.h" />
+    <ClCompile Include="include\lundump.h" />
+    <ClCompile Include="include\lvm.h" />
+    <ClCompile Include="include\lzio.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="include\llimits.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="include\llex.h" />
+    <ClCompile Include="include\ltable.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

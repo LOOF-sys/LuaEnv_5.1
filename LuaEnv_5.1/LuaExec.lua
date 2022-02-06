@@ -1,7 +1,8 @@
-function joeware()
-	print("lol")
+local function nig()
+	return "sjoe"
 end
-hookfunction(joeware,(function()
-	print("joe mama")
+local old
+old = hookfunction(nig,(function(...)
+	return "joeware"
 end))
-print(joeware())
+print(nig())

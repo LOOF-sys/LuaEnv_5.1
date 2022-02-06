@@ -8,7 +8,7 @@ extern "C" {
 #include "include/lauxlib.h"
 #include "include/lua.h"
 #include "include/lualib.h"
-#include "include/lobject.h"
+#include "include/lapi.h"
 }
 
 #ifdef WIN32
@@ -16,7 +16,7 @@ extern "C" {
 #endif
 
 void* lua_tofunction(lua_State* L, int stackn) {
-    return (void*)lua_topointer(L, stackn);
+    return (Closure*)lua_topointer(L, stackn);
 }
 
 bool CheckLua(lua_State* L, int r) {
@@ -31,76 +31,36 @@ bool CheckLua(lua_State* L, int r) {
 std::string ErrorMsg = "Cannot Class Security Check (Identity 1) Requires Identity 21 or [C].\n";
 std::string SeriousErrorMsg = "Cannot Class Security Check (Identity -2147483648) Requires Lua Stack Permissions\n";
 
-static int hook(lua_State* L) {
-    if (lua_type(L, 3) == LUA_TSTRING) {
-        std::string main_check = lua_tostring(L, 3);
-        if (main_check != "C") {
-            lua_pushstring(L, ErrorMsg.c_str());
-            lua_error(L);
-        }
-    }
-    else {
-        lua_pushstring(L, ErrorMsg.c_str());
-        lua_error(L);
-    }
+void setfuncptr(Closure* F1, Closure* F2) {
+    *F1 = *F2;
+}
+
+static int hookfunction(lua_State* L) {
     if (lua_isfunction(L,1)) {
         if (lua_isfunction(L, 2)) {
-            void* FirstFunc = lua_tofunction(L,1);
-            void* TempPtr = lua_tofunction(L, 2);
+            Closure* FirstFunc = (Closure*)lua_tofunction(L,1);
+            Closure* TempPtr = (Closure*)lua_tofunction(L, 2);
 
             if (FirstFunc && TempPtr != 0 || NULL) {
-                
+                FirstFunc->l = TempPtr->l;
             }
             else {
-                std::cout << "hookfunction failure\n";
+                lua_pushstring(L, "cannot set a non-function value");
+                lua_error(L);
             }
         }
         else {
-            if (lua_isnil(L, 2)) {
-                std::string Lwrite = lua_tostring(L, 1);
-                if (Lwrite == "Error") {
-                    std::cout << ErrorMsg;
+            if (lua_iscfunction(L, 2)) {
+                Closure* FirstFunc = (Closure*)lua_tofunction(L, 1);
+                Closure* TempPtr = (Closure*)lua_tofunction(L, 2);
+
+                if (FirstFunc && TempPtr != 0 || NULL) {
+                    FirstFunc->c = TempPtr->c;
+                    //*FirstFunc = *TempPtr;
                 }
                 else {
-                    lua_getglobal(L, Lwrite.c_str());
-                    lua_pushnil(L);
-                    lua_setglobal(L, Lwrite.c_str());
-                }
-            }
-        }
-    }
-    else
-    {
-        if (lua_type(L, 1) == LUA_TBOOLEAN) {
-            if (lua_tostring(L, 2)) {
-                std::string Lwrite = lua_tostring(L, 2);
-                lua_getglobal(L, Lwrite.c_str());
-                lua_pushnil(L);
-                lua_setglobal(L, Lwrite.c_str());
-            }
-        }
-        else {
-            if (lua_type(L, 1) == LUA_TTABLE) {
-                if (lua_tostring(L, 2)) {
-                    std::string Lwrite = lua_tostring(L, 2);
-                    if (Lwrite == "_G" || Lwrite == "_ENV") {
-                        std::cout << ErrorMsg;
-                    }
-                    else {
-                        lua_getglobal(L, Lwrite.c_str());
-                        lua_pushnil(L);
-                        lua_setglobal(L, Lwrite.c_str());
-                    }
-                }
-            }
-            else {
-                if (lua_type(L, 1) == LUA_TSTRING) {
-                    if (lua_tostring(L, 2)) {
-                        std::string Lwrite = lua_tostring(L, 2);
-                        lua_getglobal(L, Lwrite.c_str());
-                        lua_pushnil(L);
-                        lua_setglobal(L, Lwrite.c_str());
-                    }
+                    lua_pushstring(L, "cannot set a non-function value");
+                    lua_error(L);
                 }
             }
         }
@@ -118,28 +78,6 @@ static int GetRunningProcesses(lua_State*L) {
     return 0;
 }
 */
-/* function hooks */
-std::string hook_string;
-int hook_int;
-static int LUA_HOOK(lua_State* L) {
-    if (lua_type(L, 1) != LUA_TNIL) {
-        if (lua_isstring(L, 1)) {
-            hook_string = lua_tostring(L, 1);
-            lua_pushstring(L, hook_string.c_str());
-        }
-        else {
-            if (lua_isnumber(L, 1)) {
-                hook_int = lua_tonumber(L, 1);
-                lua_pushnumber(L, hook_int);
-            }
-        }
-    }
-    else {
-        lua_pushnil(L);
-    }
-    return 1;
-}
-/* =============== */
 static int clear(lua_State* L) {
     std::system("CLS");
     return 0;
@@ -163,7 +101,7 @@ static int Error(lua_State* L) {
     }
     else {
         std::cout << "Error requires a string value" << "\n";
-        lua_close(L);
+        lua_close(L);        
     }
     return 0;
 }
@@ -227,8 +165,8 @@ int main()
 
     std::cout << "Lua Output: \n\n";
 
-    lua_pushcfunction(L, hook);
-    lua_setglobal(L, "hook");
+    lua_pushcfunction(L, hookfunction);
+    lua_setglobal(L, "hookfunction");
 
     lua_pushcfunction(L, wait);
     lua_setglobal(L, "wait");
@@ -242,14 +180,14 @@ int main()
     lua_pushcfunction(L, clear);
     lua_setglobal(L, "ClearConsole");
 
-    lua_pushcfunction(L, LUA_HOOK);
-    lua_setglobal(L, "LUA_HOOK");
-
     lua_pushcfunction(L, tick);
     lua_setglobal(L, "tick");
 
     lua_pushcfunction(L, attach);
     lua_setglobal(L, "WProcAttach");
+
+    lua_pushnumber(L, -INFINITY);
+    lua_setglobal(L, "NaN");
 
     if (CheckLua(L, luaL_dofile(L, "LuaPreDefined.lua"))) {
 
@@ -262,7 +200,7 @@ int main()
         }
     }
     std::system("pause");
-    lua_close(L);
     CreateTick.detach();
+    lua_close(L);
     return 0;
 }

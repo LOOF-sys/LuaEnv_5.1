@@ -3,14 +3,33 @@ local UserScriptIdentity = 1 -- minimum
 local CurrentScriptIdentity = 20 -- max
 local currentDefined = {}
 local NewSetIdentities = {}
-local oldhook = hook
 thread = {}
 lua = {}
 console = {}
-windows = {}
+local oldGetProc = WProcAttach
+windows = {
+    gethandle = (function(...)
+        local args = {...}
+        local self = args[1] -- process
+        return self
+    end),
+    write = (function (...)
+        local args = {...}
+        local self = args[1] -- process
+        return self
+    end),
+    attach = (function(...)
+        return windows.gethandle(...)
+    end)
+}
+
 local function IdentityError(level)
     Error("Cannot Class Security Check (Identity 1) Requires Identity "..tostring(level)..".")
 end
+local function TypeError(f,arg,cType,_type)
+    Error("LuaExec.lua:"..tostring(0/0)..": bad argument #"..tostring(arg).." to '"..f.."' ("..cType.." expected, got ".._type..")")
+end
+
 local oldpairs = pairs
 
 local function pairs(...) -- anti metatable
@@ -31,19 +50,6 @@ self = _G
     C++ functions : identity 20
     hooking _G with hooktable() : identity 20
 ]]
-local oldWAttach = WProcAttach
-local MalciousFunctions = {
-    getprocesshandle = (function(Name)
-        return oldWAttach(Name)
-    end),
-    attach = (function(Name)
-        return MalciousFunctions.getprocesshandle(Name)
-    end),
-
-}
-function windows:getmfunclist()
-    
-end
 function getglobals()
     return _G
 end
@@ -290,61 +296,8 @@ end
 function printidentity()
     print(tostring(UserScriptIdentity))
 end
-function GetIdentities()
-    return {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19};
-end
 function printidentities()
     print("1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19");
-end
-function GetIdentity(value)
-    if(value >= 20)then
-        IdentityError(20)
-    end
-end
-function PushId(v)
-    if(v==21)then
-        print("Reserved for the [C] Enviornment. This state is inaccessable from Lua")
-    elseif(v==20)then
-        print("This is a State reserved for the Lua _G (Global Enviornment). The _G is utilized by the Lua Loader API (pre-defined lua)")
-    elseif(v <= 19 or v >= 4)then
-        print("This is a State reserved for the Lua Pre-Defined Enviornment. This level of Identity is usually used through out the lua pre-defined, as functions have caps for there lua permissions")
-    elseif(v == 3)then
-        print("This Identity is reserved for _G Back-End Table Enviornment, This is used in the constantdump function and some others.")
-    elseif(v == 2)then
-        print("This Identity is reserved for Changing _G.")
-    elseif(v == 1)then
-        print("This Identity is reserved for the User")
-    end
-end
-function Info()
-    print("Lua Sandbox Version: V4.1\nLua Version: 5.4\nLua Embed: C++\nLua Main API: Pre-Defined Lua Enviornment With Accessable Functions\nLua Max Identity: 20\nLua Minimum Identity: 0\nCurrent Lua Identity: 1\nCurrent API Identity: 20\nStack Status: Failed to fetch this property, Got Error: \"Missing Permissions or Invalid Identity Class\" \nLua Security: High\nAnti-Sandbox Escape: Enabled\nIdentity Protection: Enabled\nSanbox Identity(s): 21, [C], [C++] (These Identities are Reserved and called by C/C++ and are used for Accessablility to the Lua Enviornment)\n")
-end
-function Language()
-    print("Sandbox Was Programmed In: [C++]")
-end
-local function SetIdentity(func,id)
-    NewSetIdentities[func] = id
-end
-function hooktable(t, type)
-    for i, v in pairs(_G) do
-        if (t == v) then
-            if(type=="_G"or type == "_ENV")then
-                IdentityError(20)
-            else
-                oldhook(v, type,"C")
-            end
-        end
-    end
-end
-function hookboolean(bool, type)
-    if (bool == true) then
-        oldhook(true, type, "C")
-    elseif (bool == false) then
-        oldhook(false, type, "C")
-    end
-end
-function hookfunction(func,newfunc)
-    oldhook(func,newfunc,"C")
 end
 local __ = {}
 function getenv()
@@ -438,6 +391,14 @@ end
 function unpack(...)
     return table.unpack(...)
 end
+
+local oldhook = hookfunction
+function hookfunction(f,f2)
+    local oldfunc = f
+    oldhook(f,f2)
+    return oldfunc
+end
+
 function debug.dumpfunction(f,...)
     local Index = 1
     local ActualOldEnv = _ENV
@@ -822,7 +783,6 @@ function debug:getinternalthreadfunctions()
 end
 --------------------------------
 --------------------------------
-hook = nil
 WProcAttach = nil
 local allglobals = {}
 for i,v in pairs(getglobals())do
