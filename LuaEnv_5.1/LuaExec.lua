@@ -1,10 +1,5 @@
 local old
-old = hookfunction(deserialize,(function(...)
-	return print(...)
+old = hookfunction(print,(function(...)
+	return old(...)
 end))
-
-local s = serialize([[
-	print("joemama")
-]])
-
-loadstring(s)
+print("lol")

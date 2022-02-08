@@ -246,7 +246,7 @@ int main()
     lua_setglobal(L, "NaN");
 
     if (CheckLua(L, luaL_dofile(L, "LuaPreDefined.lua"))) {
-
+        
     }
     if (CheckLua(L, luaL_dofile(L, "LuaExec.lua"))) {
         lua_pushcfunction(L, Error);
