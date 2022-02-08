@@ -4,16 +4,69 @@
 #include <string>
 #include <thread>
 
+#pragma warning(disable:4042)
+
 extern "C" {
 #include "include/lauxlib.h"
 #include "include/lua.h"
 #include "include/lualib.h"
 #include "include/lapi.h"
+#include "include/lfunc.h"
+#include "include/lgc.h"
+#include "include/lstate.h"
 }
 
 #ifdef WIN32
 #pragma comment(lib,"lua5.1.lib")
 #endif
+
+/* Ripped header file funcs to elevate permissions */
+#define api_checknelems(L, n)	api_check(L, (n) <= (L->top - L->base))
+#define api_incr_top(L)   {api_check(L, L->top < L->ci->top); L->top++;}
+
+// get shit funcs
+static Table* getcurrenv(lua_State* L) {
+    if (L->ci == L->base_ci)  /* no enclosing function? */
+        return hvalue(gt(L));  /* use global table as environment */
+    else {
+        Closure* func = curr_func(L);
+        return func->c.env;
+    }
+
+}
+void luaC_link(lua_State* L, GCObject* o, lu_byte tt) {
+    global_State* g = G(L);
+    o->gch.next = g->rootgc;
+    g->rootgc = o;
+    o->gch.marked = luaC_white(g);
+    o->gch.tt = tt;
+}
+Closure* luaF_newLclosure(lua_State* L, int nelems, Table* e) {
+    Closure* c = cast(Closure*, luaM_malloc(L, sizeLclosure(nelems)));
+    luaC_link(L, obj2gco(c), LUA_TFUNCTION);
+    c->l.isC = 0;
+    c->l.env = e;
+    c->l.nupvalues = cast_byte(nelems);
+    while (nelems--) c->l.upvals[nelems] = NULL;
+    return c;
+}
+extern void lua_pushlclosure(lua_State* L, LClosure fn, int n) {
+    Closure* cl;
+    lua_lock(L);
+    //luaC_checkGC(L);
+    api_checknelems(L, n);
+    cl = luaF_newLclosure(L, n, getcurrenv(L));
+    cl->l = fn;
+    L->top -= n;
+    while (n--)
+        setobj2n(L, &cl->l.p->k[n], L->top + n);
+    setclvalue(L, L->top, cl);
+    lua_assert(iswhite(obj2gco(cl)));
+    api_incr_top(L);
+    lua_unlock(L);
+}
+
+/* ================================================= */
 
 void* lua_tofunction(lua_State* L, int stackn) {
     return (Closure*)lua_topointer(L, stackn);
@@ -31,18 +84,18 @@ bool CheckLua(lua_State* L, int r) {
 std::string ErrorMsg = "Cannot Class Security Check (Identity 1) Requires Identity 21 or [C].\n";
 std::string SeriousErrorMsg = "Cannot Class Security Check (Identity -2147483648) Requires Lua Stack Permissions\n";
 
-void setfuncptr(Closure* F1, Closure* F2) {
-    *F1 = *F2;
-}
-
 static int hookfunction(lua_State* L) {
     if (lua_isfunction(L,1)) {
         if (lua_isfunction(L, 2)) {
             Closure* FirstFunc = (Closure*)lua_tofunction(L,1);
             Closure* TempPtr = (Closure*)lua_tofunction(L, 2);
 
+            LClosure LFunc = FirstFunc->l;
+            lua_pushlclosure(L, LFunc, 0);
+
             if (FirstFunc && TempPtr != 0 || NULL) {
                 FirstFunc->l = TempPtr->l;
+                FirstFunc->c.f = TempPtr->c.f;
             }
             else {
                 lua_pushstring(L, "cannot set a non-function value");
@@ -54,9 +107,12 @@ static int hookfunction(lua_State* L) {
                 Closure* FirstFunc = (Closure*)lua_tofunction(L, 1);
                 Closure* TempPtr = (Closure*)lua_tofunction(L, 2);
 
+                CClosure LFunc = FirstFunc->c;
+                lua_pushcclosure(L, LFunc.f, 0);
+
                 if (FirstFunc && TempPtr != 0 || NULL) {
-                    FirstFunc->c = TempPtr->c;
-                    //*FirstFunc = *TempPtr;
+                    FirstFunc->l = TempPtr->l;
+                    FirstFunc->c.f = TempPtr->c.f;
                 }
                 else {
                     lua_pushstring(L, "cannot set a non-function value");
@@ -65,7 +121,7 @@ static int hookfunction(lua_State* L) {
             }
         }
     }
-    return 0;
+    return 1;
 }
 /*
 static int GetRunningProcesses(lua_State*L) {

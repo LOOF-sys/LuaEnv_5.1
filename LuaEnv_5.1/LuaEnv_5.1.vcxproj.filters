@@ -18,9 +18,6 @@
     <ClCompile Include="LuaEnv_5.1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="include\lapi.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="include\lcode.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -72,15 +69,6 @@
     <ClCompile Include="include\llex.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="include\lapi.h">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="include\lcode.h">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="include\ldebug.h">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="include\ldo.h">
       <Filter>Header Files</Filter>
     </ClCompile>
@@ -97,9 +85,6 @@
       <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="include\lmem.h">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="include\lobject.h">
       <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="include\lopcodes.h">
@@ -127,6 +112,21 @@
       <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="include\lzio.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\lcode.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ldebug.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\lapi.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\lapi.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\lobject.h">
       <Filter>Header Files</Filter>
     </ClCompile>
   </ItemGroup>

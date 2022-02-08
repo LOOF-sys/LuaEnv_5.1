@@ -326,7 +326,7 @@ function __print(v)
 end
 function warn(...)
     local text = tostring(...)
-    print("[WARNING]: "..text)
+    io.write("[WARNING]: "..text.."\n")
 end
 function getgenv()
     return __
@@ -390,13 +390,6 @@ function thread:loop_function_until(f,properties)
 end
 function unpack(...)
     return table.unpack(...)
-end
-
-local oldhook = hookfunction
-function hookfunction(f,f2)
-    local oldfunc = f
-    oldhook(f,f2)
-    return oldfunc
 end
 
 function debug.dumpfunction(f,...)

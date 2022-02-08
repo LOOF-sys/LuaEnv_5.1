@@ -1,8 +1,13 @@
-local function nig()
-	return "sjoe"
+local function ShouldntWorkInLua(str)
+	print("func: "..str)
+	return "trolled"
 end
+print(ShouldntWorkInLua("joe mama"))
 local old
-old = hookfunction(nig,(function(...)
-	return "joeware"
+old = hookfunction(ShouldntWorkInLua,(function(...)
+	return "no"
 end))
-print(nig())
+print(ShouldntWorkInLua("joe mama"))
+old("no way it worked")
+ShouldntWorkInLua = old
+print(ShouldntWorkInLua("ah now it works"))
