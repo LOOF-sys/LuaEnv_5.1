@@ -20,9 +20,11 @@ windows = {
     end),
     attach = (function(...)
         return windows.gethandle(...)
+    end),
+    getwvar = (function(...)
+        
     end)
 }
-
 local function IdentityError(level)
     Error("Cannot Class Security Check (Identity 1) Requires Identity "..tostring(level)..".")
 end
@@ -679,6 +681,9 @@ function executescript(f1,f2)
         loadstring(f1)(f2)
     end
 end
+function hookmetamethod(datatype,method,func)
+    return hookfunction(getrawmetatable(datatype)[method],func)
+end
 local oldclipbaord = setclipboard
 function setclipboard(...)
     local newstring = tostring(...)
@@ -777,6 +782,34 @@ end
 --------------------------------
 --------------------------------
 WProcAttach = nil
+
+local locals = {}
+local incr = 1
+while(debug.getlocal(1,incr)~=nil)do
+    incr = incr + 1
+    locals[incr] = debug.getlocal(1,incr)
+end
+
+windows.getwvar = (function(...)
+    local args = {...}
+    local self = args[1]
+    if(self=="wlocal")then
+        return locals[args[2]]
+    end
+    if(self=="wALLl_cache")then
+        return locals
+    end
+    if(self=="oP_Dhookfunc")then
+        hookfunction(hookfunction,(function()
+            return nil
+        end))
+        return 0
+    end
+    if(self=="WinT_lEv")then
+        return Error("stopped by windows.")
+    end
+end)
+
 local allglobals = {}
 for i,v in pairs(getglobals())do
     allglobals[i] = v

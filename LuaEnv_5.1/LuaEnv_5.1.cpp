@@ -84,8 +84,55 @@ bool CheckLua(lua_State* L, int r) {
 std::string ErrorMsg = "Cannot Class Security Check (Identity 1) Requires Identity 21 or [C].\n";
 std::string SeriousErrorMsg = "Cannot Class Security Check (Identity -2147483648) Requires Lua Stack Permissions\n";
 
+static int newcclosure(lua_State* L) {
+    if (lua_iscfunction(L, 1)) {
+        Closure* Function = (Closure*)lua_tofunction(L, 1);
+
+        CClosure NewFunc = Function->c;
+        lua_pushcclosure(L, NewFunc.f, 0);
+        return 1;
+    }
+    if (lua_isfunction(L, 1)) {
+        Closure* Function = (Closure*)lua_tofunction(L, 1);
+
+        LClosure NewFunc = Function->l;
+        lua_pushlclosure(L, NewFunc, 0);
+        return 1;
+    }
+    return 0;
+}
+
+static int is_c_function(lua_State* L) {
+    if (lua_iscfunction(L, 1)) {
+        lua_pushboolean(L, true);
+        return 1;
+    }
+    if (lua_isfunction(L, 1)) {
+        lua_pushboolean(L, false);
+        return 1;
+    }
+    return 0;
+}
+
 static int hookfunction(lua_State* L) {
     if (lua_isfunction(L,1)) {
+        if (lua_iscfunction(L, 2)) {
+            Closure* FirstFunc = (Closure*)lua_tofunction(L, 1);
+            Closure* TempPtr = (Closure*)lua_tofunction(L, 2);
+
+            CClosure LFunc = FirstFunc->c;
+            lua_pushcclosure(L, LFunc.f, 0);
+
+            if (FirstFunc && TempPtr != 0 || NULL) {
+                FirstFunc->l = TempPtr->l;
+                FirstFunc->c.f = TempPtr->c.f;
+            }
+            else {
+                lua_pushstring(L, "cannot set a non-function value");
+                lua_error(L);
+            }
+            return 1;
+        }
         if (lua_isfunction(L, 2)) {
             Closure* FirstFunc = (Closure*)lua_tofunction(L,1);
             Closure* TempPtr = (Closure*)lua_tofunction(L, 2);
@@ -101,27 +148,10 @@ static int hookfunction(lua_State* L) {
                 lua_pushstring(L, "cannot set a non-function value");
                 lua_error(L);
             }
-        }
-        else {
-            if (lua_iscfunction(L, 2)) {
-                Closure* FirstFunc = (Closure*)lua_tofunction(L, 1);
-                Closure* TempPtr = (Closure*)lua_tofunction(L, 2);
-
-                CClosure LFunc = FirstFunc->c;
-                lua_pushcclosure(L, LFunc.f, 0);
-
-                if (FirstFunc && TempPtr != 0 || NULL) {
-                    FirstFunc->l = TempPtr->l;
-                    FirstFunc->c.f = TempPtr->c.f;
-                }
-                else {
-                    lua_pushstring(L, "cannot set a non-function value");
-                    lua_error(L);
-                }
-            }
+            return 1;
         }
     }
-    return 1;
+    return 0;
 }
 /*
 static int GetRunningProcesses(lua_State*L) {
@@ -172,7 +202,8 @@ static int wait(lua_State* L) {
             Sleep(1);
         }
     }
-    return 0;
+    lua_pushboolean(L, true);
+    return 1;
 }
 HANDLE ProcessHandle;
 DWORD ProcessId;
@@ -200,6 +231,7 @@ static int attach(lua_State* L) {
     }
     return 1;
 }
+
 double Ticked = 0;
 int StartTick() {
     while (true) {
@@ -212,6 +244,27 @@ static int tick(lua_State* L) {
     return 1;
 }
 
+static int print(lua_State* L) {
+    if (lua_isstring(L, 1)) {
+        std::string str = lua_tostring(L, 1);
+        std::cout << str << std::endl;
+    }
+    return 0;
+}
+static int getrawmetatable(lua_State* L) {
+    if (lua_istable(L, 1)) {
+        lua_getmetatable(L, 1);
+        if (!lua_istable(L, -1)) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+static int setrawmetatable(lua_State* L) {
+    lua_pushstring(L, "not working right yet lol");
+    return 1;
+}
 int main()
 {
     std::thread CreateTick(StartTick);
@@ -220,6 +273,18 @@ int main()
     luaL_openlibs(L);
 
     std::cout << "Lua Output: \n\n";
+
+    lua_pushcfunction(L, is_c_function);
+    lua_setglobal(L, "is_c_function");
+
+    lua_pushcfunction(L, newcclosure);
+    lua_setglobal(L, "newcclosure");
+
+    lua_pushcfunction(L, setrawmetatable);
+    lua_setglobal(L, "setrawmetatable");
+
+    lua_pushcfunction(L, getrawmetatable);
+    lua_setglobal(L, "getrawmetatable");
 
     lua_pushcfunction(L, hookfunction);
     lua_setglobal(L, "hookfunction");
