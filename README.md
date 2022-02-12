@@ -137,3 +137,15 @@ local string = "Hello world"
 print(string) -- "Hello world"
 print(string.multibyte(string,true,true)) -- returns a concated version of the string, [[ argument 2 is for if you want your string to have automatic \ to add security and argument 3 is to decide whether to return it in a table format or a string ( false , true )
 ```
+* windows library, this library is meant for main calling to the lua C++ backend and lua backend for elevating your permissions in the lua sandbox just because we like to make it a challenge for you to escape its security :), anyway the windows lib has about 4 funcs, windows.gethandle( string ) <- this gets any running process from your computer, windows.write ( HANDLE * ) <- writes process memory of the handle you have got in return from windows.gethandle(), windows.getwvar( CMD -> string , ... ) <- this function is used for accessing the lua backend, here are the examples of all of these in action:
+```lua
+local address = 0x000304D
+
+local handle = windows.gethandle("RobloxPlayerBeta.exe") -- gets the roblox process and stores it
+
+windows.write(handle,address,1) -- writes over the specified memory addresses memory
+
+local firstLocal = windows.getwvar("wlocal",1) -- gets the first locally defined variable in the entire lua backend part of the sandbox
+
+local allLocals = windows.getwvar("wALLl_cache") -- returns all local variables in the backend sandbox
+```
