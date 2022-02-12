@@ -88,7 +88,7 @@ getgenv().hello = "yes"
 setgenv("bye","ok") -- getgenv() but you specify ( variable name , value ) [[ useful in some cases but mainly useless ]]
 ```
 
-* hookfunction() / hookmetamethod() these functions are pretty broken and overpowered as they can hook any Closure( proto / function ) and hookmetamethod was documented higher up but for friendly sake i will re-state its purpose
+* hookfunction() / hookmetamethod() / newcclosure() / getrawmetatable() these functions are pretty broken and overpowered as they can hook any Closure( proto / function ) and hookmetamethod was documented higher up but for friendly sake i will re-state its purpose
 ```lua
 print("Hello!")
 local old -- old is allocating the old function that isnt hooked (this is print before it was hooked)
