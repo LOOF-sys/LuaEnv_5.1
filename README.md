@@ -40,7 +40,7 @@ This sandbox has currently a few major uses and a few key uses for its existence
 
 * You can secure your code with the "serialize" function located in the "LuaPreDefined.lua" file with all of the backend lua sandbox powering functions, Example:
 ```lua
-local code = [[
+local code = serialize([[
 local storage_for_password = ""
 function joeware()
     return serialize("password1234")
@@ -56,7 +56,7 @@ end
 print("is running")
 dopasswordstor(joeware())
 login(storage_for_password) -- will log you in securely
-]]
+]])
 loadstring(code)
 ```
 * You can deobfuscate chaos that isnt directed to any specialized syntax or any seperate type of error handling, examples: luau, Versions lua 5.1.4+ with the help of the functions located in the "LuaPreDefined.lua" and cpp functionality for the sandbox.
