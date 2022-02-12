@@ -36,3 +36,7 @@ MT.__call = newcclosure(function(...)
 end))
 MT.__metatable = "changed lol"
 ```
+This sandbox has currently a few major uses and a few key uses for its existence void from the top listings.
+
+* You can secure your code with the "serialize" function located in the "LuaPreDefined.lua" file with all of the backend lua sandbox powering functions.
+* You can deobfuscate chaos that isnt directed to any specialized syntax or any seperate type of error handling, examples: luau, Versions lua 5.1.4+ with the help of the functions located in the "LuaPreDefined.lua" and cpp functionality for the sandbox.
