@@ -73,4 +73,54 @@ login(storage_for_password) -- will log you in securely
 loadstring(code)
 ```
 * You can deobfuscate chaos that isnt directed to any specialized syntax or any seperate type of error handling, examples: luau, Versions lua 5.1.4+ with the help of the functions located in the "LuaPreDefined.lua" and cpp functionality for the sandbox.
-* Here is the documentation for more useful functions that can be used in special scenarios
+* Here is the documentation for more useful functions that can be used in special scenarios.
+
+* getglobals() is a more of a "fancy" way to get the global variables if you just hate doing.
+```lua
+_G.print("jo")
+-- vs
+getglobals().print("sup")
+```
+
+* getgenv() / setgenv() is a second secure table channel used for storing cross global variables, just like globals but in a seperate container.
+```lua
+getgenv().hello = "yes"
+setgenv("bye","ok") -- getgenv() but you specify ( variable name , value ) [[ useful in some cases but mainly useless ]]
+```
+
+* hookfunction() / hookmetamethod() these functions are pretty broken and overpowered as they can hook any Closure( proto / function ) and hookmetamethod was documented higher up but for friendly sake i will re-state its purpose
+```lua
+print("Hello!")
+local old -- old is allocating the old function that isnt hooked (this is print before it was hooked)
+old = hookfunction(print,(function(...) -- using varags or "..." to get every variable passed for a better printing method
+    return warn(...)
+end))
+
+print("warning?") -- it will now call warn(...) instead of print(...)
+old("printed!")
+
+local old -- once again we allocate the old metamethod function inside of old to call it later
+old = hookmetamethod(_G,"__call",(function(...)
+    return {"no table for you :)"}
+end))
+print(_G()) -- essentially what this now returns is a table that is not _G but is now the {"no table for you :)"}, get what i mean? ill re-iterate what i just said.
+old() -- returns _G globals table
+-- hookmetamethod is basically hookfunction() and cannot process anything besides functions for now but this issue will be fixed. basically this is hookmetamethod for you lua nerds
+
+local old
+old = hookfunction(getrawmetatable(_G).__call,(function(...) -- now "getrawmetatable" pulls the metatable and returns it to lua (simply it returns a modifiable table to change the metamethods that are defined in a table (that isnt readonly)
+    return {"trolled"}
+end))
+print(_G()[1]) -- this will print "trolled" as its hooked now
+print(old()) -- returns old _G once again
+
+getrawmetatable().__metatable = "changed" -- this method is by far the most raw you can get when it comes to changing metamethods as you can also do
+
+local MT = getrawmetatable(_G) -- gets the _G metatables (no different from the examples above with getrawmetatable)
+local oldcall = MT.__call -- gets the old definition or local old; old = hookfunction(getrawmetatable(_G).__call,(function()return nil end)) , the ; in the syntax there is just to divide the lines.
+MT.__call = newcclosure(function(...) -- newcclosure simply returns a lua closure back as it isnt yet working.
+    return {"lol ez hook"}
+end)
+print(_G[1]) -- prints "lol ez hook"
+print(oldcall()) -- prints the _G table
+```
