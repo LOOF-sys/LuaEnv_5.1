@@ -1,6 +1,8 @@
 # LuaEnv_5.1 / Lua Sandbox Running Lua Version 5.1.4 (Open Source)
 Lua 5.1.4 Version of the original Lua Env, Also enhanced majorly and has alot better functions and stability
 
+* Source Files to view before reading this: "LuaPreDefined.lua" and "LuaEnv_5.1.cpp"
+
 Currently this lua sandbox is built for deobfuscation / reversing and breaking lua scripts security, it is *currently* equipped with functions like:
 ```lua
 local function breaker()
