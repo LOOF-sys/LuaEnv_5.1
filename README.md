@@ -73,3 +73,4 @@ login(storage_for_password) -- will log you in securely
 loadstring(code)
 ```
 * You can deobfuscate chaos that isnt directed to any specialized syntax or any seperate type of error handling, examples: luau, Versions lua 5.1.4+ with the help of the functions located in the "LuaPreDefined.lua" and cpp functionality for the sandbox.
+* Here is the documentation for more useful functions that can be used in special scenarios
