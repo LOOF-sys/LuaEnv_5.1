@@ -149,3 +149,6 @@ local firstLocal = windows.getwvar("wlocal",1) -- gets the first locally defined
 
 local allLocals = windows.getwvar("wALLl_cache") -- returns all local variables in the backend sandbox
 ```
+
+There is alot and i meant **ALOT** more of functions in this lua sandbox, but we have documented here the main and most useful ones out of them *for us* specifically, you could have a special use for these functions and have personal opinions on them too. Any bugs that are foudn please tell me on discord
+#Discord: Cypher#2763
