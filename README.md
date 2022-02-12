@@ -154,7 +154,7 @@ There is alot and i meant **ALOT** more of functions in this lua sandbox, but we
 # Discord: Cypher#2763 | dm me to report issues
 
 * Next step... The downloading step.
-*Download link: https://www.mediafire.com/file/4ot1t1ked0oeqj0/LuaSandboxV2.zip/file*
+Download link: **https://www.mediafire.com/file/4ot1t1ked0oeqj0/LuaSandboxV2.zip/file**
 
 * Step 1: Download the file once you arrive at the link, Download to any folder and extract the zip file.
 * Steps 2: **Preferably use any IDE to edit the lua files** Open the "LuaExec.lua" in **an IDE** or Notepad if you just dont care about syntax highlighting
