@@ -14,18 +14,28 @@ old = hookfunction(breaker,(function()
 end))
 breaker() -- will not crash the client since the function has been overriden
 
-local try_again = {}
+local try_again = {"original"}
 setmetatable(try_again,{__metatable = "protected lol",__call = (function()return try_again end)}) -- for metatables we will do a little trolling (there is 3 ways you can go about handling this)
 -- method 1
+
+print(getmetatable(try_again)) -- will print "protected lol" as the metatable thinks it has cornered us, but fear not as we have some special functions to deal just with this.
+print(try_again()[1]) -- will print "original"
+
 local old -- currently hookmetamethod only hooks functions (this will be fixed in a later update)
 old = hookmetamethod(try_again,"__call",(function(...)
     return {"joeware"}
 end))
+
+print(try_again()[1]) -- will print "joeware"
+
 -- method 2
 local old -- preferably i like this method the most for hooking the function because it is faster then the common method (method 3)
 old = hookfunction(getrawmetatable(try_again).__call,(function(...)
     return {"lol","rekt"}
 end))
+
+print(try_again()[1]) -- will print "lol"
+
 -- method 3
 local MT = getrawmetatable(try_again)
 local oldcall = MT.__call
@@ -33,8 +43,11 @@ local oldMetatable = MT.__metatable -- this is a very useful aspect of method 3 
 
 MT.__call = newcclosure(function(...)
     return {"classic"}
-end))
+end)
 MT.__metatable = "changed lol"
+
+print(getmetatable(try_again)) -- will print the new hooked changed metatable 
+print(try_again()[1]) -- will print "classic"
 ```
 This sandbox has currently a few major uses and a few key uses for its existence void from the top listings.
 
