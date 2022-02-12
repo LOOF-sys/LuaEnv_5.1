@@ -53,7 +53,7 @@ This sandbox has currently a few major uses and a few key uses for its existence
 
 * You can secure your code with the "serialize" function located in the "LuaPreDefined.lua" file with all of the backend lua sandbox powering functions, Example:
 ```lua
-local code = serialize([[
+local code = serialize([[ -- serialize ( string )
 local storage_for_password = ""
 function joeware()
     return serialize("password1234")
@@ -84,7 +84,7 @@ getglobals().print("sup")
 
 * getgenv() / setgenv() is a second secure table channel used for storing cross global variables, just like globals but in a seperate container.
 ```lua
-getgenv().hello = "yes"
+getgenv().hello = "yes" 
 setgenv("bye","ok") -- getgenv() but you specify ( variable name , value ) [[ useful in some cases but mainly useless ]]
 ```
 
@@ -123,4 +123,17 @@ MT.__call = newcclosure(function(...) -- newcclosure simply returns a lua closur
 end)
 print(_G[1]) -- prints "lol ez hook"
 print(oldcall()) -- prints the _G table
+```
+* table.unconcat(), this is used for taking a string and breaking it up into a table (useful for obfuscation), table.unconcat( string )
+```lua
+local string = "joe mama aint secure yet"
+for i,v in pairs(table.unconcat(string))do
+    print(i,v)
+end -- prints each char (character) from the string
+```
+* string.multibyte() / table.multibyte(), these functions are built for byting strings, similar to the "string.byte()" function but instead it takes in an entire string, for table.multibyte i think it takes a table and returns all the chars in it to a byte format (these functions are useful for obfuscating strings) : table.multibyte ( table , boolean ), string.multibyte ( string , boolean , boolean )
+```lua
+local string = "Hello world"
+print(string) -- "Hello world"
+print(string.multibyte(string,true,true)) -- returns a concated version of the string, [[ argument 2 is for if you want your string to have automatic \ to add security and argument 3 is to decide whether to return it in a table format or a string ( false , true )
 ```
