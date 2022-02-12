@@ -1,0 +1,1 @@
+return "It is better if you use visual studio to edit this file as the syntax highlighting is better then old shitty notepad"

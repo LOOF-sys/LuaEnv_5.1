@@ -84,7 +84,7 @@ function table.unconcat(str)
 end
 function table.multibyte(tab,conversion)
     local output = {}
-    for i,v in pairs(tab)do
+    for i,v in pairs(tab)do 
         if(typeof(v)=="string")then
             if(not conversion)then
                 local char = string.byte(v)
