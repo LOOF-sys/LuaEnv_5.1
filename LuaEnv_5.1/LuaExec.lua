@@ -1,1 +1,9 @@
-return "It is better if you use visual studio to edit this file as the syntax highlighting is better then old shitty notepad"
+local lasted = getfenv
+local pairs = pairs
+local print = print
+windows.encrypt(function()
+	print("joe")
+end)
+for i,v in pairs(lasted())do
+	print(i,v)
+end

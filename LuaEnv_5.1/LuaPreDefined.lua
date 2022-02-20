@@ -809,11 +809,31 @@ windows.getwvar = (function(...)
         return Error("stopped by windows.")
     end
 end)
+local getfenv = getfenv
+local deserialize = deserialize
+windows.encrypt = (function(f,...)
+    f(...)
+    local getfenv = getfenv
+    local serialize = serialize
+    local newEnv = {}
+    for i,v in pairs(getfenv())do
+        newEnv[serialize(i)] = v
+    end
+    setfenv(2,newEnv)
+end)
+windows.decrypt = (function()
+    local newEnv = {}
+    for i,v in pairs(getfenv())do
+        newEnv[deserialize(i)] = v
+    end
+    setfenv(2,newEnv)
+end)
 
 local allglobals = {}
 for i,v in pairs(getglobals())do
     allglobals[i] = v
 end
+
 local count = 0
 setmetatable(_G,{__metatable = "_G Enviornment Protection",__close = (function()
     IdentityError(20)
