@@ -1,6 +1,8 @@
 # LuaEnv_5.1 / Lua Sandbox Running Lua Version 5.1.4 (Open Source)
 Lua 5.1.4 Version of the original Lua Env, Also enhanced majorly and has alot better functions and stability
 
+* Made by Cypher#2763 / Powered by Lua 5.1.4 / C++
+
 Currently this lua sandbox is built for deobfuscation / reversing and breaking lua scripts security, it is *currently* equipped with functions like:
 ```lua
 local function breaker()
@@ -154,3 +156,9 @@ There is alot and i meant **ALOT** more of functions in this lua sandbox, but we
 # Discord: Cypher#2763 | dm me to report issues
 
 * Next step... The downloading step.
+Download link: **https://www.mediafire.com/file/4ot1t1ked0oeqj0/LuaSandboxV2.zip/file**
+
+* Step 1: Download the file once you arrive at the link, Download to any folder and extract the zip file.
+* Steps 2: **Preferably use any IDE to edit the lua files** Open the "LuaExec.lua" in **an IDE** or Notepad if you just dont care about syntax highlighting
+* Step 3: after that make sure the .exe is in the directory "LuaEnv_5.1.exe" and once you are ready to run your lua code you simply double click the exe and your code will run, to stop your code just close the exe.
+* Step 4: If you are confused you can always read the source either here or by opening the "LuaBackend.lua" File to view the backend lua functions that are used in realtime by the lua sandbox.
