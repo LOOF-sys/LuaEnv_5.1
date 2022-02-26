@@ -279,6 +279,13 @@ function deserialize(str)
     end
     return output
 end
+function cpp(text)
+    text = text:gsub("<<","")
+    text = text:gsub("std::cout","print")
+    text = text:gsub("std::endl","\n")
+    text = text:gsub(";","")
+    lloadstring(text)
+end
 function console.log(...)
     return print(...)
 end
@@ -288,13 +295,13 @@ end
 function error(...)
     Error(tostring(...))
 end
-function hookstring(string, type)
-    for i, v in pairs(_G) do
-        if (v == string) then
-            oldhook(v, type, "C")
-        end
-    end
+
+function scriptware_disassembled_to_lua(str)
+    str = str:gsub("    ","")
+    str = str:gsub("; proto name:","function"):gsub("; linedefined:","-- function defined at"):gsub("; maxstacksize: 04","-- ?"):gsub("; is_vararg:","-- has varags"):gsub("01","true")
+    return str
 end
+
 function printidentity()
     print(tostring(UserScriptIdentity))
 end
@@ -660,7 +667,7 @@ local function secure_loadstring(code)
     end
 end
 function loadstring(...)
-    function BackendOptional(string)
+    local function BackendOptional(string)
         if(typeof(string)=="string")then
             secure_loadstring(string)
         else
@@ -672,7 +679,47 @@ function loadstring(...)
     else
         Error("loadstring requires a string to operate")
     end
-    return ...
+    return BackendOptional
+end
+local index_strs = 1
+local strs = {
+
+}
+function lloadstring(...)
+    local function BackendOptional(string)
+        if(typeof(string)=="string")then
+            secure_loadstring(string)
+        else
+            Error("loadstring custom backend requires a string to operate")
+        end
+    end
+    if(typeof(...)=="string")then
+        local is_based = false
+        for i,v in pairs(strs)do
+            if(strs[i].string==(...))then
+                if(string.find(strs[i].string,strs[i].find))then
+                    strs[i].callback(strs[i],strs[i].varags)
+                end
+                oldloadstring(strs[i].string)
+                is_based = true
+            end
+        end
+        if(is_based==false)then
+            oldloadstring(...)
+        end
+    else
+        Error("loadstring requires a string to operate")
+    end
+    return BackendOptional
+end
+function lloadallocate(mainstr,str,func,...)
+    strs[index_strs] = {
+        string = mainstr,
+        find = str,
+        callback = func,
+        varags = (...)
+    }
+    index_strs = index_strs + 1
 end
 function executescript(f1,f2)
     if(f2==nil)then
