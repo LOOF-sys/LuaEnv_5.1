@@ -27,6 +27,14 @@ function callgenv(func,...)
 	return hookfunction(func,func)(...)
 end
 
+function getglobals()
+	return _G
+end
+
+function setglobal(index,v)	
+	_G[index] = v
+end
+
 --// Segemented Variables
 local _pairs = pairs
 local _typeof = typeof
@@ -34,6 +42,10 @@ local _rep = string.rep
 local _wait = wait
 local _print = print
 local _random = math.random
+
+obfuscate.serialize = serialize
+
+serialize = nil --// Removing because its reallocated to obfuscate
 
 function table.find(t,sig)
 	for i,v in _pairs(t)do

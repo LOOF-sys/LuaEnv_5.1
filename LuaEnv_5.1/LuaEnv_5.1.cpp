@@ -180,7 +180,7 @@ char bytes[150] = { '1','2','3','4','5','6','7','8','9','0',
                     'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
                     'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'
 };
-static int cserialize(lua_State* L) {
+static int serialize(lua_State* L) {
     if (lua_isstring(L, 1)) {
         const char* str = lua_tostring(L, 1);
         const char* Serialized;
@@ -326,7 +326,6 @@ int main()
     lua_pushcfunction(L, LuaWinApi);
     lua_setglobal(L, "LWA");
 
-
     lua_pushcfunction(L, newcclosure);
     lua_setglobal(L, "newcclosure");
 
@@ -348,6 +347,8 @@ int main()
     lua_pushcfunction(L, tick);
     lua_setglobal(L, "tick");
 
+    lua_pushcfunction(L, serialize);
+    lua_setglobal(L, "serialize");
 
     if (CheckLua(L, luaL_dofile(L, "LuaPreDefined.lua"))) {
         
