@@ -237,7 +237,7 @@ end
 function windows.closeprompt()
 	return __LWA(1)
 end
-
+	
 function windows.messagebox(Title, Message, Code)
 	return __LWA(2,Title, Message, Code)
 end
@@ -289,7 +289,7 @@ end
 
 local function InterceptFuncArgs(...)
 	return {...}
-end
+end	
 
 function deobfuscate.sandboxFunction(f,...)
 	local env = getfenv()
