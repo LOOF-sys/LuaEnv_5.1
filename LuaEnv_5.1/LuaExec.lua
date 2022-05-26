@@ -1,10 +1,34 @@
-local string1 = [[
-	print("from lua sandbox :) joeware")
-]]
-lloadstring(string1) -- lloadstring is a new function similar to "loadstring" but does not attempt to deserialize the text. (its a faster loadstring)
-
-lloadallocate(string1,"joeware",(function(linker_table,...)
-	linker_table.string = linker_table.string:gsub("joeware","noware")
-	print("removed joeware but caller gave us "..(...))
-end),"this magik")
-lloadstring(string1) -- run it for yourself
+deobfuscate.dumpTable(deobfuscate.disassembleTable(deobfuscate.sandboxFunction(function(...)
+	local packed = {}
+	local function pack(arg)
+		packed[math.random(1,10000)] = {
+			[math.random(1,10000)] = {
+				[math.random(1,10000)] = math.random(1,10000),
+				[math.random(1,10000)] = math.random(1,10000),
+				[math.random(1,10000)] = math.random(1,10000)
+			},
+			[math.random(1,10000)] = {
+				[math.random(1,10000)] = {
+					[math.random(1,10000)] = math.random(1,10000),
+					[math.random(1,10000)] = math.random(1,10000),
+					[math.random(1,10000)] = math.random(1,10000)
+				},
+				[math.random(1,10000)] = {
+					[math.random(1,10000)] = {
+						[math.random(1,10000)] = math.random(1,10000),
+						[math.random(1,10000)] = math.random(1,10000),
+						[math.random(1,10000)] = math.random(1,10000)
+					},
+					[math.random(1,10000)] = math.random(1,10000),
+					[math.random(1,10000)] = arg,
+					[math.random(1,10000)] = math.random(1,10000)
+				}
+			}
+		}
+	end
+	local protected = {...}
+	for i,v in pairs(protected)do
+		pack(v)
+	end
+	return packed
+end,"joe")))
