@@ -181,6 +181,7 @@ char bytes[150] = { '1','2','3','4','5','6','7','8','9','0',
                     'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'
 };
 static int serialize(lua_State* L) {
+    return 0;
     if (lua_isstring(L, 1)) {
         const char* str = lua_tostring(L, 1);
         const char* Serialized;
@@ -193,6 +194,7 @@ static int serialize(lua_State* L) {
 
         }
     }
+    return 0;
 }
 static int loadstring(lua_State* L) {
     if (lua_isstring(L, 1)) {
