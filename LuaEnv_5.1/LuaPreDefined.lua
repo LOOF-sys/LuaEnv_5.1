@@ -153,7 +153,7 @@ function deobfuscate.disassembleTable(t)
 				dumped_table[nxt] = (_rep(" ",space).."["..i.."]: ".."\""..tostring(v).."\",")
 				nxt = nxt + 1
 			end
-			if(_typeof(v)=="number")then
+			if(_typeof(v)=="number")then	
 				dumped_table[nxt] = (_rep(" ",space).."["..i.."]: "..tostring(v)..",")
 				nxt = nxt + 1
 			end
