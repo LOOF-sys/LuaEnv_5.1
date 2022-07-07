@@ -90,7 +90,7 @@ getgenv().hello = "yes"
 setgenv("bye","ok") -- getgenv() but you specify ( variable name , value ) [[ useful in some cases but mainly useless ]]
 ```
 
-* hookfunction() / hookmetamethod() / newcclosure() / getrawmetatable() these functions are pretty broken and overpowered as they can hook any Closure( proto / function ) and hookmetamethod was documented higher up but for friendly sake i will re-state its purpose
+* hookfunction() / hookmetamethod() / newcclosure() / getrawmetatable() / setrawmetatable() / setreadonly() these functions are pretty broken and overpowered as they can hook any Closure( proto / function ) and hookmetamethod was documented higher up but for friendly sake i will re-state its purpose
 ```lua
 print("Hello!")
 local old -- old is allocating the old function that isnt hooked (this is print before it was hooked)
@@ -123,21 +123,34 @@ local oldcall = MT.__call -- gets the old definition or local old; old = hookfun
 MT.__call = newcclosure(function(...) -- newcclosure simply returns a lua closure back as it isnt yet working.
     return {"lol ez hook"}
 end)
+
 print(_G[1]) -- prints "lol ez hook"
 print(oldcall()) -- prints the _G table
+
+setrawmetatable(_G,{ -- this function is very new and is very useful for metamethod hooking (it bypasses readonly tables)
+	__metatable = "this is a new function",
+	__call = (function()
+		return {"modified"}
+	end)
+}
+
+-- heres a case where setreadonly may be needed
+getgenv().shit = false -- error, table is readonly, the main reason its readonly is so you dont damage any of your variables without directly calling setgenv() (setgenv bypasses the readonly)
+setreadonly(getgenv(),false) -- this will disable readonly allowing you to edit the table manually
+getgenv().shit = false -- no error
 ```
-* table.unconcat(), this is used for taking a string and breaking it up into a table (useful for obfuscation), table.unconcat( string )
+* table.unconcat(), this is used for taking a string and breaking it up into a table (useful for obfuscation), table.unconcat( string ) Return Value: Table
 ```lua
 local string = "joe mama aint secure yet"
 for i,v in pairs(table.unconcat(string))do
     print(i,v)
 end -- prints each char (character) from the string
 ```
-* string.multibyte() / table.multibyte(), these functions are built for byting strings, similar to the "string.byte()" function but instead it takes in an entire string, for table.multibyte i think it takes a table and returns all the chars in it to a byte format (these functions are useful for obfuscating strings) : table.multibyte ( table , boolean ), string.multibyte ( string , boolean , boolean )
+* obfuscate.multibyte(), this function is built for byting strings, similar to the "string.byte()" function but instead it takes in an entire string, the options will switch it from taking a table and returning all the chars in it to a byte format to some other stuff (this function is useful for obfuscating strings) : obfuscate.multibyte( string , options: Table {Type: String, Slashes: Boolean} )
 ```lua
 local string = "Hello world"
 print(string) -- "Hello world"
-print(string.multibyte(string,true,true)) -- returns a concated version of the string, [[ argument 2 is for if you want your string to have automatic \ to add security and argument 3 is to decide whether to return it in a table format or a string ( false , true )
+print(obfuscate.multibyte(string,{Type = "string", Slashes = true})) -- returns a encoded string (string.byte encoded) that is pre-added with the backslashes, The arguments for the table are {Type = "string" or "table", Backslashes = true or false}
 ```
 * windows library, this library is meant for main calling to the lua C++ backend and lua backend for elevating your permissions in the lua sandbox just because we like to make it a challenge for you to escape its security :), anyway the windows lib has about 4 funcs, windows.gethandle( string ) <- this gets any running process from your computer, windows.write ( HANDLE * ) <- writes process memory of the handle you have got in return from windows.gethandle(), windows.getwvar( CMD -> string , ... ) <- this function is used for accessing the lua backend, here are the examples of all of these in action:
 ```lua
@@ -153,12 +166,7 @@ local allLocals = windows.getwvar("wALLl_cache") -- returns all local variables 
 ```
 
 There is alot and i meant **ALOT** more of functions in this lua sandbox, but we have documented here the main and most useful ones out of them *for us* specifically, you could have a special use for these functions and have personal opinions on them too. Any bugs that are foudn please tell me on discord
-# Discord: Cypher#2763 | dm me to report issues
+# Discord: Cypher#6678 | dm me to report issues
 
-* Next step... The downloading step.
-Download link: **https://www.mediafire.com/file/4ot1t1ked0oeqj0/LuaSandboxV2.zip/file**
-
-* Step 1: Download the file once you arrive at the link, Download to any folder and extract the zip file.
-* Steps 2: **Preferably use any IDE to edit the lua files** Open the "LuaExec.lua" in **an IDE** or Notepad if you just dont care about syntax highlighting
-* Step 3: after that make sure the .exe is in the directory "LuaEnv_5.1.exe" and once you are ready to run your lua code you simply double click the exe and your code will run, to stop your code just close the exe.
-* Step 4: If you are confused you can always read the source either here or by opening the "LuaBackend.lua" File to view the backend lua functions that are used in realtime by the lua sandbox.
+* How do you download this Sandbox? Easy. Follow the steps below
+* On the left there should be a little thing called "Releases", under that there should be a release, click it and it should download right away, after that go to your downloads folder and extract the zip to where ever, then from there delete the zip and keep the extracted folder, open it up, then open up the folder inside it, then edit the "LuaExec.lua" file preferably in an IDE and boom just edit it and whenever your ready to run your lua code, just run the .exe
