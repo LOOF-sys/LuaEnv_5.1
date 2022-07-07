@@ -1,8 +1,18 @@
-local encode = "hello"
-encode = obfuscate.multibyte(encode,{
-     Type = "string",
-     Withslashes = true
+
+local metatable = {"joe"}
+setmetatable(metatable,{
+	__metatable = "readonly",
+	__index = (function()
+		return "trol"
+	end)
 })
-encode = encode:sub(3,#encode)
-print(encode)
---// The string is now encoded (try it)
+
+setreadonly(metatable,true)
+
+metatable[2] = "shit"
+print(metatable[1])
+
+setreadonly(metatable,false)
+print(getrawmetatable(metatable).__newindex)
+metatable[2] = "nigger"
+print(metatable[2])

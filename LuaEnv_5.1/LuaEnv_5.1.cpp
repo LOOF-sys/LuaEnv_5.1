@@ -16,10 +16,6 @@ extern "C" {
 #include "include/lstate.h"
 }
 
-#ifdef WIN32
-#pragma comment(lib,"lua5.1.lib")
-#endif
-
 HANDLE Console = GetStdHandle(STD_OUTPUT_HANDLE);
 
 void CError(lua_State* L, const char* Msg) {
@@ -27,7 +23,12 @@ void CError(lua_State* L, const char* Msg) {
     SetConsoleTextAttribute(Console, 12);
     lua_error(L);
     SetConsoleTextAttribute(Console, 7);
-    return;
+}
+
+void CWarn(lua_State* L, const char* Msg) {
+    SetConsoleTextAttribute(Console, 14);
+    std::cout << Msg << std::endl;
+    SetConsoleTextAttribute(Console, 7);
 }
 
 /* Ripped header file funcs to elevate permissions */
@@ -222,6 +223,47 @@ static int getrawmetatable(lua_State* L) {
     return 1;
 }
 
+static int ReadOnlyIndex(lua_State* L) {
+    CWarn(L, "attempt to modify a readonly table");
+    return 0;
+}
+
+static int setreadonly(lua_State* L) {
+    if (lua_istable(L, 1) && lua_isboolean(L,2)) {
+        lua_newtable(L);
+        if (lua_toboolean(L, 2) == true) {
+            lua_pushcclosure(L, ReadOnlyIndex, 1);
+            lua_setfield(L, -3, "__newindex");
+            lua_pushstring(L, "readonly");
+            lua_setfield(L, -3, "__metatable");
+            lua_settop(L, 1);
+            lua_setmetatable(L, -3);
+            lua_pushboolean(L, 1);
+        }
+        else {
+            lua_pushstring(L, "default metatable");
+            lua_setfield(L, -2, "__metatable");
+            lua_getmetatable(L, 1);
+            *(Table*)lua_topointer(L, -1) = *(Table*)lua_topointer(L, -2);
+            lua_pushboolean(L, 1);
+        }
+        return 1;
+    }
+    lua_pushboolean(L, 0);
+    return 1;
+}
+    
+static int setrawmetatable(lua_State* L) {
+    if (lua_istable(L, 1) && lua_istable(L, 2)) {
+        lua_getmetatable(L, 1);
+        *(Table*)lua_topointer(L, -1) = *(Table*)lua_topointer(L, 2);
+        lua_pushboolean(L, 1);
+        return 1;
+    }
+    lua_pushboolean(L, 0);
+    return 1;
+}
+
 static int wait(lua_State* L) {
     if (lua_isnumber(L, 1)) {
         Sleep(1000 * lua_tonumber(L, 1));
@@ -268,49 +310,6 @@ static int LuaWinApi(lua_State* L) {
     return 0;
 }
 
-/* i broke it kinda
-static int setrawmetatable(lua_State* L) {
-    if (lua_istable(L, 1) && lua_isstring(L, 2)) {
-        lua_getmetatable(L, 1);
-        if (!lua_istable(L, -1)) {
-            CError(L, "[!] \"setrawmetatable\" requires a table with a metatable already set");
-            return 0;
-        }
-        switch (lua_type(L, 3)) {
-        case 1:
-            lua_pushboolean(L, 3);
-            break;
-        case 2:
-            lua_pushlightuserdata(L, lua_touserdata(L,3));
-            break;
-        case 5:
-            CError(L, "[!] \"setrawmetatable\" error, cannot interpret a table, please use the version located in the \"lua\" lib");
-            break;
-        case 6:
-            if (lua_iscfunction(L, 3)) {
-                lua_pushcclosure(L, lua_tocfunction(L, 3), 0);
-            }
-            else {
-                Closure* Func = (Closure*)lua_tofunction(L, 3);
-                lua_pushlclosure(L, Func->l, 0);
-            }
-        case 8: // Continue working on this
-            lua_pushthread(L);
-        case -1:
-            lua_pushnil(L);
-        case 0:
-            lua_pushnil(L);
-        default:
-            lua_pushnil(L);
-            break;
-        }
-        lua_setfield(L, -2, lua_tostring(L, 2));
-    }
-    lua_pushboolean(L, 1);
-    return 1;
-}
-*/
-
 #pragma endregion Functions
 
 int main()
@@ -325,6 +324,9 @@ int main()
     lua_pushcfunction(L, is_c_function);
     lua_setglobal(L, "is_c_function");
 
+    lua_pushcfunction(L, setreadonly);
+    lua_setglobal(L, "setreadonly");
+
     lua_pushcfunction(L, LuaWinApi);
     lua_setglobal(L, "LWA");
 
@@ -334,8 +336,11 @@ int main()
     lua_pushcfunction(L, getrawmetatable);
     lua_setglobal(L, "getrawmetatable");
 
+    lua_pushcfunction(L, setrawmetatable);
+    lua_setglobal(L, "setrawmetatable");
+
     lua_pushcfunction(L, warn);
-    lua_setglobal(L, "__warn");
+    lua_setglobal(L, "warn");
 
     lua_pushcfunction(L, hookfunction);
     lua_setglobal(L, "hookfunction");

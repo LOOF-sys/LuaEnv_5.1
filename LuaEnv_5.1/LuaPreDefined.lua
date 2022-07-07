@@ -7,20 +7,23 @@ serialize = {}
 
 --// Local (Protected)
 local __getgenv = {}
-local CError = Error
+local CError = error
 
-Error = nil --// Once again, for security
+local oldrawset = rawset
 
 function typeof(Type)
+	if(type(Type)=="table"and getmetatable(Type)=="debugtable")then
+		return "debugtable"
+	end
 	return type(Type)
 end
 
-function getgenv()
-	return __getgenv
+function getgenv(Index)
+	return getgenv
 end
 
 function setgenv(index,value)
-	getgenv()[index] = value
+	return oldrawset(__getgenv,index,value)
 end
 
 function callgenv(func,...)
@@ -33,6 +36,17 @@ end
 
 function setglobal(index,v)	
 	_G[index] = v
+end
+
+rawset = nil
+function rawset(Table, Index, Value)
+	if(getmetatable(Table)=="debugtable")then
+		return warn("attempt to modify a readonly table")
+	end
+	if(getmetatable(Table)=="readonly")then
+		return warn("attempt to modify a readonly table")
+	end
+	return oldrawset(Table,Index,Value)
 end
 
 --// Segemented Variables
@@ -53,12 +67,6 @@ function table.find(t,sig)
 			return true
 		end
 	end
-end
-
-function setrawmetatable(Table, index, value)
-	local meta = getrawmetatable(Table)
-	meta[index] = value
-	return meta
 end
 
 function hookmetamethod(Table, method, value)
@@ -375,25 +383,14 @@ function deobfuscate.sandboxFunction(f,...)
 	return InterceptedArgs
 end
 
-local _warn = __warn
-function warn(...)
-	local args = {...}
-	local onebig = ""
-	for i,v in _pairs(args)do
-		onebig = onebig..tostring(v).."   "
-	end
-	_warn(onebig)
-	return true;
-end
-__warn = nil --// for safety reasons
-
 setmetatable(_G,{
 	__metatable = "_G Environment Protection",
 	__call = (function()return _G end),
 	__close = (function()return CError("Missing Permissions")end)
 })
 setmetatable(__getgenv,{
-	__metatable = "_G Environment Protection",
+	__metatable = "readonly",
 	__call = (function()CError("Missing Permissions")end),
-	__close = (function()return CError("Missing Permissions")end)
+	__close = (function()return CError("Missing Permissions")end),
+	__newindex = (function()return CError("attempt to modify a readonly table") end)
 })
