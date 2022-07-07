@@ -272,6 +272,14 @@ static int wait(lua_State* L) {
     return 1;
 }
 
+static int castint(lua_State* L) {
+    if (lua_isnumber(L, 1)) {
+        lua_pushinteger(L, lua_tointeger(L, 1));
+        return 1;
+    }
+    return 0;
+}
+
 static int warn(lua_State* L) {
     if (lua_isstring(L, 1)) {
         SetConsoleTextAttribute(Console, 14);
@@ -356,6 +364,9 @@ int main()
 
     lua_pushcfunction(L, serialize);
     lua_setglobal(L, "serialize");
+
+    lua_pushcfunction(L, castint);
+    lua_setglobal(L, "castint");
 
     if (CheckLua(L, luaL_dofile(L, "LuaPreDefined.lua"))) {
         

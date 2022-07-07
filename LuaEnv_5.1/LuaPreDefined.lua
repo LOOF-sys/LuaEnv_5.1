@@ -4,6 +4,7 @@ windows = {}
 obfuscate = {}
 deobfuscate = {}
 serialize = {}
+casting = {}
 
 --// Local (Protected)
 local __getgenv = {}
@@ -67,6 +68,13 @@ function table.find(t,sig)
 			return true
 		end
 	end
+end
+
+casting.castint = castint
+castint = nil
+
+function math.round(number)
+	return casting.castint(number)
 end
 
 function hookmetamethod(Table, method, value)
@@ -382,6 +390,11 @@ function deobfuscate.sandboxFunction(f,...)
 	InterceptedArgs["MAIN_CALLING_FUNCTION_"..tostring(_random(1,999999999))] = deobfuscate.unpack(InterceptFuncArgs(f(...)),"table")
 	return InterceptedArgs
 end
+
+setreadonly(obfuscate,true)
+setreadonly(deobfuscate,true)
+setreadonly(windows,true)
+setreadonly(serialize,true)
 
 setmetatable(_G,{
 	__metatable = "_G Environment Protection",
