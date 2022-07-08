@@ -1,172 +1,184 @@
-# LuaEnv_5.1 / Lua Sandbox Running Lua Version 5.1.4 (Open Source)
-Lua 5.1.4 Version of the original Lua Env, Also enhanced majorly and has alot better functions and stability
+# Lua Sandbox Running Lua 5.1.4
+* Made by Cypher#6678 | For lua documentation visit https://www.lua.org/manual/5.1/manual.html#2
+This sandbox is made for multiple major tasks and suddle tasks such as reverse engineering, encryption and much more, this documentation will walk you through the most valuable functions
 
-* Made by Cypher#2763 / Powered by Lua 5.1.4 / C++
+## Global Hooking Library (Based in _G)
+This segmented part of _G is dedicated to hooking security / cracking malicious code and or reverse engineering lua code in some cases
 
-Currently this lua sandbox is built for deobfuscation / reversing and breaking lua scripts security, it is *currently* equipped with functions like:
+* hookfunction( function1 , function2 ) Return Value: Function
+This function is made to hook other functions and replace them with there same type of closure/function, it is very important in handling malicious code
 ```lua
-local function breaker()
-    while(true)do
-        print("rekt")
-    end
+function totally_safe_function_that_does_math(int1,int2)
+	hidden_malicious_function()
+	return int1 + int2
 end
-local old
-old = hookfunction(breaker,(function()
-    return "nah not gonna happen"
+function hidden_malicious_function()
+	while(true)do -- crash (this can be as harmless as this to as bad as an ACE exploit on the sandbox
+		print("L")
+	end
+end
+
+-- To deal with functions like this, heres what you do
+local old = nil -- initalize the variable
+old = hookfunction(hidden_malicious_function,(function()
+	-- put whatever replacement code you want here (can just be blank aswell
+	return warn("an unexpected call to an unverified function has occured")
 end))
-breaker() -- will not crash the client since the function has been overriden
-
-local try_again = {"original"}
-setmetatable(try_again,{__metatable = "protected lol",__call = (function()return try_again end)}) -- for metatables we will do a little trolling (there is 3 ways you can go about handling this)
--- method 1
-
-print(getmetatable(try_again)) -- will print "protected lol" as the metatable thinks it has cornered us, but fear not as we have some special functions to deal just with this.
-print(try_again()[1]) -- will print "original"
-
-local old -- currently hookmetamethod only hooks functions (this will be fixed in a later update)
-old = hookmetamethod(try_again,"__call",(function(...)
-    return {"joeware"}
-end))
-
-print(try_again()[1]) -- will print "joeware"
-
--- method 2
-local old -- preferably i like this method the most for hooking the function because it is faster then the common method (method 3)
-old = hookfunction(getrawmetatable(try_again).__call,(function(...)
-    return {"lol","rekt"}
-end))
-
-print(try_again()[1]) -- will print "lol"
-
--- method 3
-local MT = getrawmetatable(try_again)
-local oldcall = MT.__call
-local oldMetatable = MT.__metatable -- this is a very useful aspect of method 3 as you can (CURRENTLY) only replace non-functions with method 3 as hookmetamethod is shit right now
-
-MT.__call = newcclosure(function(...)
-    return {"classic"}
-end)
-MT.__metatable = "changed lol"
-
-print(getmetatable(try_again)) -- will print the new hooked changed metatable 
-print(try_again()[1]) -- will print "classic"
-```
-This sandbox has currently a few major uses and a few key uses for its existence void from the top listings.
-
-* You can secure your code with the "serialize" function located in the "LuaPreDefined.lua" file with all of the backend lua sandbox powering functions, Example:
-```lua
-local code = serialize([[ -- serialize ( string )
-local storage_for_password = ""
-function joeware()
-    return serialize("password1234")
-end
-function dopasswordstor(password)
-    storage_for_password = password
-end
-local function login(password)
-    if(deserialize(password)=="password1234")then
-        print("logged in")
-    end
-end
-print("is running")
-dopasswordstor(joeware())
-login(storage_for_password) -- will log you in securely
-]])
-loadstring(code)
-```
-* You can deobfuscate chaos that isnt directed to any specialized syntax or any seperate type of error handling, examples: luau, Versions lua 5.1.4+ with the help of the functions located in the "LuaPreDefined.lua" and cpp functionality for the sandbox.
-* Here is the documentation for more useful functions that can be used in special scenarios.
-
-* getglobals() is a more of a "fancy" way to get the global variables if you just hate doing.
-```lua
-_G.print("jo")
--- vs
-getglobals().print("sup")
+print(old) -- "old" is the original function before it was hooked, its the malicious function basically
+old() -- crash because its the malicious function
 ```
 
-* getgenv() / setgenv() is a second secure table channel used for storing cross global variables, just like globals but in a seperate container.
+* hookmetamethod( table , method , value: any) Return Value: Old
+This function is used to override metatable values that you specify, it is very useful when a malicious script overrides a key metatable that you need to access, heres how you use it
 ```lua
-getgenv().hello = "yes" 
-setgenv("bye","ok") -- getgenv() but you specify ( variable name , value ) [[ useful in some cases but mainly useless ]]
+local important = {"i this table to store stuff"}
+function hacker_thing()
+	setmetatable(important,{
+		__metatable = "stolen",
+		__newindex = (function()
+			return "haha now you need to use rawset L"
+		end)
+	})
+end
+hacker_thing()
+-- The malicious function thinks it has won, but heres what you can do to override it
+local old = nil -- store the old function 
+old = hookmetamethod(important,"__newindex",(function(v,i)
+	return rawset(important,i,v)
+end))
+
+important[420] = "works now" -- works
+
+print(old()) -- "haha now you need to use rawset L"
 ```
 
-* hookfunction() / hookmetamethod() / newcclosure() / getrawmetatable() / setrawmetatable() / setreadonly() these functions are pretty broken and overpowered as they can hook any Closure( proto / function ) and hookmetamethod was documented higher up but for friendly sake i will re-state its purpose
+* getrawmetatable( table ) Return Value: Table
+This function is used to get the raw metatable from a table (if one exists) (all methods assigned to the metatable) and return it, Example:
 ```lua
-print("Hello!")
-local old -- old is allocating the old function that isnt hooked (this is print before it was hooked)
-old = hookfunction(print,(function(...) -- using varags or "..." to get every variable passed for a better printing method
-    return warn(...)
-end))
-
-print("warning?") -- it will now call warn(...) instead of print(...)
-old("printed!")
-
-local old -- once again we allocate the old metamethod function inside of old to call it later
-old = hookmetamethod(_G,"__call",(function(...)
-    return {"no table for you :)"}
-end))
-print(_G()) -- essentially what this now returns is a table that is not _G but is now the {"no table for you :)"}, get what i mean? ill re-iterate what i just said.
-old() -- returns _G globals table
--- hookmetamethod is basically hookfunction() and cannot process anything besides functions for now but this issue will be fixed. basically this is hookmetamethod for you lua nerds
-
-local old
-old = hookfunction(getrawmetatable(_G).__call,(function(...) -- now "getrawmetatable" pulls the metatable and returns it to lua (simply it returns a modifiable table to change the metamethods that are defined in a table (that isnt readonly)
-    return {"trolled"}
-end))
-print(_G()[1]) -- this will print "trolled" as its hooked now
-print(old()) -- returns old _G once again
-
-getrawmetatable().__metatable = "changed" -- this method is by far the most raw you can get when it comes to changing metamethods as you can also do
-
-local MT = getrawmetatable(_G) -- gets the _G metatables (no different from the examples above with getrawmetatable)
-local oldcall = MT.__call -- gets the old definition or local old; old = hookfunction(getrawmetatable(_G).__call,(function()return nil end)) , the ; in the syntax there is just to divide the lines.
-MT.__call = newcclosure(function(...) -- newcclosure simply returns a lua closure back as it isnt yet working.
-    return {"lol ez hook"}
-end)
-
-print(_G[1]) -- prints "lol ez hook"
-print(oldcall()) -- prints the _G table
-
-setrawmetatable(_G,{ -- this function is very new and is very useful for metamethod hooking (it bypasses readonly tables)
-	__metatable = "this is a new function",
-	__call = (function()
-		return {"modified"}
+local New = {}
+setmetatable(New,{
+	__metatable = "im set",
+	__index = (function(v,i) -- how do i know this is here ahead of time?
+		return warn("not a value")
 	end)
+})
+
+-- to check lets do this
+if(getrawmetatable(New).__index~=nil)then
+	print("is set!")
+end
+
+-- getrawmetatable can also be used for assaulting metatable security (similar to hookmetamethod or setrawmetatable
+```
+
+* setrawmetatable( table , table ) Return Value: Boolean
+This function is used to override a tables (ALREADY SET) metatable, Example of use:
+```lua
+local Table = {}
+
+function hacked()
+	setmetatable(Table,{
+		__metatable = "haha ive ruined your __metatable value >:)"
+	})
+end
+hacked()
+
+-- it thinks we are screwed but let us show what we can do
+setrawmetatable(Table,{
+	__metatable = "get ratioed bozo"
+})
+```
+
+* setreadonly( Table, Boolean ) Return Value: Boolean
+This function is used to change the writeability of a table based on the Boolean provided
+```lua
+local LockMe = {"important"}
+setreadonly(LockMe,true)
+LockMe[2] = "oof" -- warning: attempt to modify a readonly table
+
+setreadonly(LockMe,false)
+LockMe[2] = "oof" -- works
+```
+
+## Obfuscation & Serialization Library
+This library is used to obfuscate / secure your code with many advanced algorithms to simple table encoding and simple string security
+
+* obfuscate.unconcat( string ) Return Value: Table
+This function takes a string and breaks it up into an array of characters that make up the string, Example:
+```lua
+local FullString = "yo whats up"
+FullString = obfuscate.unconcat(FullString)
+print(FullString) -- it will now print a table that contains all of the characters in FullString
+```
+
+* obfuscate.multibyte( string, Table: {["Type"] = "table" or "string", ["Slashes"] = true or false}) Return Value: String or Table
+This function is a bit of a hassle to get the hang of, but its basically the string encrypter and it has some options with it, Example:
+```lua
+local String = "whats up" -- define a string
+
+print(obfuscate.multibyte(String,{
+	Type = "string", -- set the setting so it returns a string rather then a table of the encrypted chars
+	Slashes = true -- if the strings/table will contain slashes
+}))
+
+print(obfuscate.multibyte(String,{
+	Type = "table", -- set it as a table so it returns an array with each index containing a small string being the encrypted char
+	Slashes = true -- if the strings/table will contain slashes
+}))
+```
+
+* serialize.CreateCharacter( char ) Return Value: String
+This function takes a character and returns a random based serialized encoded version of it, very very secure way of encrypting your strings and is a hassle to reverse engineer, Example of usage:
+```lua
+local Encrypt = {"y","o"}
+local Encrypted = {}
+for i,v in pairs(Encrypt)do
+	Encrypted[i] = serialize.CreateCharacter(v)
+end
+print(table.concat(Encrypted)) -- prints "yo" in a randomized encrypted form
+```
+
+* serialize.DecodeCharacter( string ) Return Value: char
+This function does the opposite of serialize.CreateCharacter, it decrypts the character with an untraceable & non embedded method, Example:
+```lua
+local Encrypt = {"y","o"}
+local Encrypted = {}
+for i,v in pairs(Encrypt)do
+	Encrypted[i] = serialize.CreateCharacter(v)
+end
+print(table.concat(Encrypted)) -- prints "yo" in a randomized encrypted form
+
+for i,v in pairs(Encrypted)do
+	Encrypted[i] = serialize.DecodeCharacter(v)
+end
+print(table.concat(Encrypted)) -- prints "yo" normally
+```
+
+## Deobfuscation Library
+This library is made to attempt to deobfuscate scripts and decrypt some of there contents, its not very good for what it is yet but it does have some very concrete functions
+
+* deobfuscate.disassembleTable( table ) Return Value: Table
+This function takes in a table and returns a completely dug up version of it (all of the buried values are rosen to the top and placed in an organize array), Example:
+```lua
+
+-- we will print all of the contents of _G in an organized fasion
+deobfuscate.dumpTable(deobfuscate.disassembleTable(_G),false) -- prints all of _G
+```
+
+* deobfuscate.dumpTable( table, boolean) Return Value: 0
+This function basically takes a tables and prints all of its top layer contexts, its essentially a compressed for loop, Example:
+```lua
+local Table = {"hello","dumper","lol"}
+deobfuscate.dumpTable(Table,false) -- prints all of the contexts with the index
+deobfuscate.dumpTable(Table,true) -- prints all of the contexts without the index
+```
+
+* [!] WARNING: UNRELIABLE FUNCTION | ~~deobfuscate.reverseTable( table ) Return Value: nil~~
+This function is used to swiutch the i and v values around so its v = i, Example:
+```lua
+local Table = {
+	["Wrong Way"] = 1
 }
-
--- heres a case where setreadonly may be needed
-getgenv().shit = false -- error, table is readonly, the main reason its readonly is so you dont damage any of your variables without directly calling setgenv() (setgenv bypasses the readonly)
-setreadonly(getgenv(),false) -- this will disable readonly allowing you to edit the table manually
-getgenv().shit = false -- no error
+Table = deobfuscate.reverseTable(Table)
+print(Table[1]) -- prints "Wrong Way"
 ```
-* table.unconcat(), this is used for taking a string and breaking it up into a table (useful for obfuscation), table.unconcat( string ) Return Value: Table
-```lua
-local string = "joe mama aint secure yet"
-for i,v in pairs(table.unconcat(string))do
-    print(i,v)
-end -- prints each char (character) from the string
-```
-* obfuscate.multibyte(), this function is built for byting strings, similar to the "string.byte()" function but instead it takes in an entire string, the options will switch it from taking a table and returning all the chars in it to a byte format to some other stuff (this function is useful for obfuscating strings) : obfuscate.multibyte( string , options: Table {Type: String, Slashes: Boolean} )
-```lua
-local string = "Hello world"
-print(string) -- "Hello world"
-print(obfuscate.multibyte(string,{Type = "string", Slashes = true})) -- returns a encoded string (string.byte encoded) that is pre-added with the backslashes, The arguments for the table are {Type = "string" or "table", Backslashes = true or false}
-```
-* windows library, this library is meant for main calling to the lua C++ backend and lua backend for elevating your permissions in the lua sandbox just because we like to make it a challenge for you to escape its security :), anyway the windows lib has about 4 funcs, windows.gethandle( string ) <- this gets any running process from your computer, windows.write ( HANDLE * ) <- writes process memory of the handle you have got in return from windows.gethandle(), windows.getwvar( CMD -> string , ... ) <- this function is used for accessing the lua backend, here are the examples of all of these in action:
-```lua
-local address = 0x000304D
-
-local handle = windows.gethandle("RobloxPlayerBeta.exe") -- gets the roblox process and stores it
-
-windows.write(handle,address,1) -- writes over the specified memory addresses memory
-
-local firstLocal = windows.getwvar("wlocal",1) -- gets the first locally defined variable in the entire lua backend part of the sandbox
-
-local allLocals = windows.getwvar("wALLl_cache") -- returns all local variables in the backend sandbox
-```
-
-There is alot and i meant **ALOT** more of functions in this lua sandbox, but we have documented here the main and most useful ones out of them *for us* specifically, you could have a special use for these functions and have personal opinions on them too. Any bugs that are foudn please tell me on discord
-# Discord: Cypher#6678 | dm me to report issues
-
-* How do you download this Sandbox? Easy. Follow the steps below
-* On the left there should be a little thing called "Releases", under that there should be a release, click it and it should download right away, after that go to your downloads folder and extract the zip to where ever, then from there delete the zip and keep the extracted folder, open it up, then open up the folder inside it, then edit the "LuaExec.lua" file preferably in an IDE and boom just edit it and whenever your ready to run your lua code, just run the .exe
