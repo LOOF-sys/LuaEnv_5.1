@@ -5,7 +5,7 @@ This sandbox is made for multiple major tasks and suddle tasks such as reverse e
 ## Global Hooking Library (Based in _G)
 This segmented part of _G is dedicated to hooking security / cracking malicious code and or reverse engineering lua code in some cases
 
-* **hookfunction( function1 , function2 ) Return Value: Function**
+* ★**hookfunction( function1 , function2 ) Return Value: Function**
 * This function is made to hook other functions and replace them with there same type of closure/function, it is very important in handling malicious code
 ```lua
 function totally_safe_function_that_does_math(int1,int2)
@@ -52,7 +52,7 @@ important[420] = "works now" -- works
 print(old()) -- "haha now you need to use rawset L"
 ```
 
-* **getrawmetatable( table ) Return Value: Table**
+* ★**getrawmetatable( table ) Return Value: Table**
 * This function is used to get the raw metatable from a table (if one exists) (all methods assigned to the metatable) and return it, Example:
 ```lua
 local New = {}
@@ -127,7 +127,7 @@ print(obfuscate.multibyte(String,{
 }))
 ```
 
-* **serialize.CreateCharacter( char ) Return Value: String**
+* ★**serialize.CreateCharacter( char ) Return Value: String**
 * This function takes a character and returns a random based serialized encoded version of it, very very secure way of encrypting your strings and is a hassle to reverse engineer, Example of usage:
 ```lua
 local Encrypt = {"y","o"}
@@ -138,7 +138,7 @@ end
 print(table.concat(Encrypted)) -- prints "yo" in a randomized encrypted form
 ```
 
-* **serialize.DecodeCharacter( string ) Return Value: char**
+* ★**serialize.DecodeCharacter( string ) Return Value: char**
 * This function does the opposite of serialize.CreateCharacter, it decrypts the character with an untraceable & non embedded method, Example:
 ```lua
 local Encrypt = {"y","o"}
@@ -157,7 +157,7 @@ print(table.concat(Encrypted)) -- prints "yo" normally
 ## Deobfuscation Library
 This library is made to attempt to deobfuscate scripts and decrypt some of there contents, its not very good for what it is yet but it does have some very concrete functions
 
-* **deobfuscate.disassembleTable( table ) Return Value: Table**
+* ★**deobfuscate.disassembleTable( table ) Return Value: Table**
 * This function takes in a table and returns a completely dug up version of it (all of the buried values are rosen to the top and placed in an organize array), Example:
 ```lua
 
@@ -182,3 +182,60 @@ local Table = {
 Table = deobfuscate.reverseTable(Table)
 print(Table[1]) -- prints "Wrong Way"
 ```
+
+* **deobfuscate.unpack( table, string: "string" or "table") Return Value: string or table or false
+* This function is used to get all of a tables values and store them in either a string or table, Example: 
+```lua
+local Store = {"yo","bruh"}
+local StoreString = ""
+StoreString = deobfuscate.unpack(Store,"string") -- will import all of the tables values into StoreString
+```
+
+* ★***deobfuscate.sandboxFunction(function, ...) Return Value: Table***
+* This function is very **special** and is one of the best reversing function this entire sandbox has to offer as it hijacks the sandbox's env and logs all function calls therefor telling you everything the function is doing, very useful for debugging, Example:
+```lua
+function malicious()
+	local cantTraceMyLoop = {"lol"}
+	for i,v in pairs(cantTraceMyLoop)do -- logged "pairs" call
+		print(v) -- logged "print" call
+	end
+	return cantTraceMyLoop -- intercepted
+end
+deobfuscate.sandboxFunction(cantTraceMyLoop)
+```
+
+## Windows Library
+This library is used to directly call to windows like opening messageboxes, closeing the windows, clearing the window and much more
+
+* [?] This function is superseded by io.write | > windows.write(...) Return Value: true
+* This function calls to io.write(...), Example:
+```lua
+windows.write("lol\n") -- prints "lol" from io.write
+```
+
+* ★**windows.closeprompt() Return Value: nil**
+* This function closes the current prompt/window the lua sandbox is running in
+```lua
+windows.closeprompt() -- closes the windows
+```
+
+* ★**windows.messagebox(string: Title, string: Message, integer: Code) Return Value: nil**
+* This function opens up a message box with the current args provided
+```lua
+windows.messagebox("lol","sussy error",16) -- opens up an error box
+```
+
+* ★**windows.clear() Return Value: nil**
+* This function clears the prompt of all text
+```lua
+print("annying text")
+windows.clear() -- clears the console of all text
+
+* **windows.echo(...) Return Value: nil**
+* This function calls directly to C to print the text you provide it, this function does not support multi-args
+```lua
+windows.echo("hello world") -- prints "hello world"
+```
+
+## Default _G
+The default functions inside of the sandbox
