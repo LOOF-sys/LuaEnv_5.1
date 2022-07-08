@@ -230,6 +230,7 @@ windows.messagebox("lol","sussy error",16) -- opens up an error box
 ```lua
 print("annying text")
 windows.clear() -- clears the console of all text
+```
 
 * **windows.echo(...) Return Value: nil**
 * This function calls directly to C to print the text you provide it, this function does not support multi-args
@@ -239,3 +240,32 @@ windows.echo("hello world") -- prints "hello world"
 
 ## Default _G
 The default functions inside of the sandbox
+
+* **typeof( type ) Return Value: string**
+* Function used to identify the type of something, same as the "type" function
+```lua
+print(typeof(45)) -- prints "number"
+```
+
+* **getgenv() Return Value: Locked Table**
+* This function is used to access the private getgenv table used to store backend variables
+```lua
+setgenv("lol",1) -- set a value to getgenv table
+print(getgenv().lol) -- print "lol" value
+```
+
+* **callgenv(function) Return Value: Function Return**
+* This function calls the function through C
+```lua
+callgenv(print,"lol") -- prints "lol"
+```
+
+* **getglobals() Return Value: _G**
+* Fancy way to get _G
+```lua
+getglobals().print("yo") -- prints "yo"
+```
+
+# How to Install? Below is a guide, Any issues report to Cypher#6678 on Discord
+* How do you download this Sandbox? Easy. Follow the steps below
+* On the left there should be a little thing called "Releases", under that there should be a release, click it and it should download right away, after that go to your downloads folder and extract the zip to where ever, then from there delete the zip and keep the extracted folder, open it up, then open up the folder inside it, then edit the "LuaExec.lua" file preferably in an IDE and boom just edit it and whenever your ready to run your lua code, just run the .exe
