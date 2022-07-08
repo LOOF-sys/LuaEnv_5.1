@@ -5,8 +5,8 @@ This sandbox is made for multiple major tasks and suddle tasks such as reverse e
 ## Global Hooking Library (Based in _G)
 This segmented part of _G is dedicated to hooking security / cracking malicious code and or reverse engineering lua code in some cases
 
-** hookfunction( function1 , function2 ) Return Value: Function
-This function is made to hook other functions and replace them with there same type of closure/function, it is very important in handling malicious code
+* **hookfunction( function1 , function2 ) Return Value: Function**
+* This function is made to hook other functions and replace them with there same type of closure/function, it is very important in handling malicious code
 ```lua
 function totally_safe_function_that_does_math(int1,int2)
 	hidden_malicious_function()
