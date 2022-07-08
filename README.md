@@ -28,8 +28,8 @@ print(old) -- "old" is the original function before it was hooked, its the malic
 old() -- crash because its the malicious function
 ```
 
-* hookmetamethod( table , method , value: any) Return Value: Old
-This function is used to override metatable values that you specify, it is very useful when a malicious script overrides a key metatable that you need to access, heres how you use it
+* **hookmetamethod( table , method , value: any) Return Value: Old**
+* This function is used to override metatable values that you specify, it is very useful when a malicious script overrides a key metatable that you need to access, heres how you use it
 ```lua
 local important = {"i this table to store stuff"}
 function hacker_thing()
@@ -52,8 +52,8 @@ important[420] = "works now" -- works
 print(old()) -- "haha now you need to use rawset L"
 ```
 
-* getrawmetatable( table ) Return Value: Table
-This function is used to get the raw metatable from a table (if one exists) (all methods assigned to the metatable) and return it, Example:
+* **getrawmetatable( table ) Return Value: Table**
+* This function is used to get the raw metatable from a table (if one exists) (all methods assigned to the metatable) and return it, Example:
 ```lua
 local New = {}
 setmetatable(New,{
@@ -71,8 +71,8 @@ end
 -- getrawmetatable can also be used for assaulting metatable security (similar to hookmetamethod or setrawmetatable
 ```
 
-* setrawmetatable( table , table ) Return Value: Boolean
-This function is used to override a tables (ALREADY SET) metatable, Example of use:
+* **setrawmetatable( table , table ) Return Value: Boolean**
+* This function is used to override a tables (ALREADY SET) metatable, Example of use:
 ```lua
 local Table = {}
 
@@ -89,8 +89,8 @@ setrawmetatable(Table,{
 })
 ```
 
-* setreadonly( Table, Boolean ) Return Value: Boolean
-This function is used to change the writeability of a table based on the Boolean provided
+* **setreadonly( Table, Boolean ) Return Value: Boolean**
+* This function is used to change the writeability of a table based on the Boolean provided
 ```lua
 local LockMe = {"important"}
 setreadonly(LockMe,true)
@@ -103,16 +103,16 @@ LockMe[2] = "oof" -- works
 ## Obfuscation & Serialization Library
 This library is used to obfuscate / secure your code with many advanced algorithms to simple table encoding and simple string security
 
-* obfuscate.unconcat( string ) Return Value: Table
-This function takes a string and breaks it up into an array of characters that make up the string, Example:
+* **obfuscate.unconcat( string ) Return Value: Table**
+* This function takes a string and breaks it up into an array of characters that make up the string, Example:
 ```lua
 local FullString = "yo whats up"
 FullString = obfuscate.unconcat(FullString)
 print(FullString) -- it will now print a table that contains all of the characters in FullString
 ```
 
-* obfuscate.multibyte( string, Table: {["Type"] = "table" or "string", ["Slashes"] = true or false}) Return Value: String or Table
-This function is a bit of a hassle to get the hang of, but its basically the string encrypter and it has some options with it, Example:
+* **obfuscate.multibyte( string, Table: {["Type"] = "table" or "string", ["Slashes"] = true or false}) Return Value: String or Table**
+* This function is a bit of a hassle to get the hang of, but its basically the string encrypter and it has some options with it, Example:
 ```lua
 local String = "whats up" -- define a string
 
@@ -127,8 +127,8 @@ print(obfuscate.multibyte(String,{
 }))
 ```
 
-* serialize.CreateCharacter( char ) Return Value: String
-This function takes a character and returns a random based serialized encoded version of it, very very secure way of encrypting your strings and is a hassle to reverse engineer, Example of usage:
+* **serialize.CreateCharacter( char ) Return Value: String**
+* This function takes a character and returns a random based serialized encoded version of it, very very secure way of encrypting your strings and is a hassle to reverse engineer, Example of usage:
 ```lua
 local Encrypt = {"y","o"}
 local Encrypted = {}
@@ -138,8 +138,8 @@ end
 print(table.concat(Encrypted)) -- prints "yo" in a randomized encrypted form
 ```
 
-* serialize.DecodeCharacter( string ) Return Value: char
-This function does the opposite of serialize.CreateCharacter, it decrypts the character with an untraceable & non embedded method, Example:
+* **serialize.DecodeCharacter( string ) Return Value: char**
+* This function does the opposite of serialize.CreateCharacter, it decrypts the character with an untraceable & non embedded method, Example:
 ```lua
 local Encrypt = {"y","o"}
 local Encrypted = {}
@@ -157,24 +157,24 @@ print(table.concat(Encrypted)) -- prints "yo" normally
 ## Deobfuscation Library
 This library is made to attempt to deobfuscate scripts and decrypt some of there contents, its not very good for what it is yet but it does have some very concrete functions
 
-* deobfuscate.disassembleTable( table ) Return Value: Table
-This function takes in a table and returns a completely dug up version of it (all of the buried values are rosen to the top and placed in an organize array), Example:
+* **deobfuscate.disassembleTable( table ) Return Value: Table**
+* This function takes in a table and returns a completely dug up version of it (all of the buried values are rosen to the top and placed in an organize array), Example:
 ```lua
 
 -- we will print all of the contents of _G in an organized fasion
 deobfuscate.dumpTable(deobfuscate.disassembleTable(_G),false) -- prints all of _G
 ```
 
-* deobfuscate.dumpTable( table, boolean) Return Value: 0
-This function basically takes a tables and prints all of its top layer contexts, its essentially a compressed for loop, Example:
+* **deobfuscate.dumpTable( table, boolean) Return Value: 0**
+* This function basically takes a tables and prints all of its top layer contexts, its essentially a compressed for loop, Example:
 ```lua
 local Table = {"hello","dumper","lol"}
 deobfuscate.dumpTable(Table,false) -- prints all of the contexts with the index
 deobfuscate.dumpTable(Table,true) -- prints all of the contexts without the index
 ```
 
-* [!] WARNING: UNRELIABLE FUNCTION | ~~deobfuscate.reverseTable( table ) Return Value: nil~~
-This function is used to swiutch the i and v values around so its v = i, Example:
+* **[!] WARNING: UNRELIABLE FUNCTION | ~~deobfuscate.reverseTable( table ) Return Value: nil~~**
+* This function is used to swiutch the i and v values around so its v = i, Example:
 ```lua
 local Table = {
 	["Wrong Way"] = 1
