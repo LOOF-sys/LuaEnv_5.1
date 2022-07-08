@@ -176,27 +176,6 @@ static int tick(lua_State* L) {
     lua_pushnumber(L, Ticked);
     return 1;
 }
-char bytes[150] = { '1','2','3','4','5','6','7','8','9','0',
-                    '!','@','#','$','%','^','&','*','(',')','-','_','+','=','[',']','{','}','\\','|',':',':','"','\'','<','>',',','.','?','/','~','`',
-                    'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
-                    'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'
-};
-static int serialize(lua_State* L) {
-    return 0;
-    if (lua_isstring(L, 1)) {
-        const char* str = lua_tostring(L, 1);
-        const char* Serialized;
-        std::srand(100);
-        int Random1, Random2, Random3;
-        Random1 = std::rand();
-        Random2 = std::rand();
-        Random3 = std::rand();
-        for (long i = 0; i < strlen(str); i++) {
-
-        }
-    }
-    return 0;
-}
 static int loadstring(lua_State* L) {
     if (lua_isstring(L, 1)) {
         if (lua_isstring(L, 2)) {
@@ -361,9 +340,6 @@ int main()
 
     lua_pushcfunction(L, tick);
     lua_setglobal(L, "tick");
-
-    lua_pushcfunction(L, serialize);
-    lua_setglobal(L, "serialize");
 
     lua_pushcfunction(L, castint);
     lua_setglobal(L, "castint");
